@@ -10,15 +10,6 @@ import glob
 if sys.version_info < (3, 4):
     raise RuntimeError("Python >= 3.4 required")
 
-try:
-    libseq_version = subprocess.run(
-        ['libsequenceConfig', '--version'], stdout=subprocess.PIPE)
-except subprocess.CalledProcessError as error:
-    print("Fatal error:", error)
-
-if libseq_version.stdout.decode('utf8').rstrip() < "1.9.7":
-    raise ValueError("libsequence >= " + '1.9.7' + "required")
-
 __version__ = '0.2.2'
 
 # clang/llvm is default for OS X builds.

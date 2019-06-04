@@ -401,17 +401,17 @@ dnl Define the files to be configured
 AC_CONFIG_FILES([Makefile setup.py requirements.txt docs/conf.py libsequence/__init__.py])
 AC_CONFIG_HEADERS([config.h])
 
-MINLSEQVERSION="1.9.7"
-AC_SUBST(MINLIBSEQ,$MINLSEQVERSION)
-LIBSEQVERSION=`libsequenceConfig --version`
-
-dnl Check that libsequence version is sufficient
-if test "$LIBSEQVERSION" \< $MINLSEQVERSION
-then
-	AC_MSG_ERROR([libsequence >= $MINLSEQVERSION required, please install from http://github.com/molpopgen/libsequence])
-else
-	echo "libsequence version $LIBSEQVERSION detected"
-fi
+dnl MINLSEQVERSION="1.9.7"
+dnl AC_SUBST(MINLIBSEQ,$MINLSEQVERSION)
+dnl LIBSEQVERSION=`libsequenceConfig --version`
+dnl 
+dnl dnl Check that libsequence version is sufficient
+dnl if test "$LIBSEQVERSION" \< $MINLSEQVERSION
+dnl then
+dnl 	AC_MSG_ERROR([libsequence >= $MINLSEQVERSION required, please install from http://github.com/molpopgen/libsequence])
+dnl else
+dnl 	echo "libsequence version $LIBSEQVERSION detected"
+dnl fi
 
 MINPYBIND11VERSION="2.2.3"
 AC_SUBST(MINPYBIND11,$MINPYBIND11VERSION)
@@ -421,15 +421,15 @@ AC_SUBST(MINPYBIND11,$MINPYBIND11VERSION)
 AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 AC_LANG(C++)
 
-AC_CHECK_HEADER(Sequence/SimData.hpp, , [AC_MSG_ERROR([Sequence/SimData.hpp not found. Please make sure that libsequence
-                                         is installed correctly and that your environment is configured correctly.])])
+dnl AC_CHECK_HEADER(Sequence/SimData.hpp, , [AC_MSG_ERROR([Sequence/SimData.hpp not found. Please make sure that libsequence
+dnl                                          is installed correctly and that your environment is configured correctly.])])
 
 dnl check for C++ libraries that are required
-AC_LANG_SAVE
-          AC_LANG_CPLUSPLUS
-          AC_REQUIRE_CPP
-          AC_CHECK_LIB(sequence, main,,[AC_MSG_ERROR([could not link to libsequence runtime library.])])
-AC_LANG_RESTORE
+dnl AC_LANG_SAVE
+dnl           AC_LANG_CPLUSPLUS
+dnl           AC_REQUIRE_CPP
+dnl           AC_CHECK_LIB(sequence, main,,[AC_MSG_ERROR([could not link to libsequence runtime library.])])
+dnl AC_LANG_RESTORE
 
 
 dnl Generate config.status
