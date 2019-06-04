@@ -39,5 +39,5 @@ install:
     #- conda install htslib==1.3.2 #Attempt pinning
     - conda install -c conda-forge msprime
 script:
-    - python setup.py build_ext -i 
+    - python setup.py build_ext -i --no-weffcpp
     - python -m unittest discover tests
