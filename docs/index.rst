@@ -25,33 +25,27 @@ Contents:
 Functions and classes
 ##########################################
 
-.. automodule:: libsequence.variant_matrix
+.. autoclass:: libsequence.VariantMatrix
    :members:
-   :show-inheritance:
 
-.. automodule:: libsequence.summstats 
+.. autoclass:: libsequence.AlleleCountMatrix
    :members:
-   :show-inheritance:
 
-Deprecated Functions and classes
+.. autoclass:: libsequence.ColView
+   :members:
+
+.. autoclass:: libsequence.ConstColView
+   :members:
+
+.. autoclass:: libsequence.RowView
+   :members:
+
+.. autoclass:: libsequence.ConstRowView
+   :members:
+
+Deprecated functions and classes
 ##########################################
 
-.. automodule:: libsequence.polytable
-   :members:
-   :show-inheritance:
-
-
-.. automodule:: libsequence.fst
-   :members:
-   :show-inheritance:
-
-.. automodule:: libsequence.windows 
-   :members:
-   :show-inheritance:
-
-.. automodule:: libsequence.msprime
-   :members:
-   :show-inheritance:
 
 Indices and tables
 ==================

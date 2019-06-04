@@ -9,7 +9,7 @@ respectively
 .. ipython:: python
 
     from __future__ import print_function
-    from libsequence.polytable import SimData
+    import libsequence
 
 Assigning to an object
 ----------------------
@@ -24,7 +24,7 @@ Here, there are 2 sites and a sample size of :math:`n=4`
 
     rawData1 = [(0.1,'0101'),(0.2,'1010')]
     #We can construct objects straight from these tuples
-    sd = SimData(rawData1)
+    sd = libsequence.SimData(rawData1)
     sd.size()
     sd.pos()
     sd.data()
@@ -49,7 +49,6 @@ See :class:`libsequence.summstats.PolySIM` for more documentation
 
 .. ipython:: python
 
-    from libsequence.summstats import PolySIM
     #ms 10 1 -s 10 -I 2 5 5 0.05
     rawDataPos=[0.0997, 0.2551, 0.3600, 0.4831, 0.5205, 0.5668, 0.5824, 0.6213, 0.7499, 0.9669]
     rawDataGenos=['0000001010',
@@ -63,7 +62,7 @@ See :class:`libsequence.summstats.PolySIM` for more documentation
                   '1111010100',
                   '1111010100']
     sd.assign(rawDataPos,rawDataGenos)
-    ps = PolySIM(sd)
+    ps = libsequence.PolySIM(sd)
     ps.thetapi()
     ps.thetaw()
     ps.tajimasd()
@@ -71,8 +70,8 @@ See :class:`libsequence.summstats.PolySIM` for more documentation
 Filtering sites
 ------------------
 
-You may also filter sites from your variation tables using :func:`libsequence.polytable.removeColumns`, which operates on
-objects of type :class:`libsequence.summstats.StateCounter`.
+You may also filter sites from your variation tables using :func:`libsequence.removeColumns`, which operates on
+objects of type :class:`libsequence.StateCounter`.
 
 Our data look like this right now:
 
@@ -84,15 +83,14 @@ Let's remove derived singletons:
 
 .. ipython:: python
 
-    from libsequence.polytable import removeColumns
-    sd2 = removeColumns(sd,lambda x : x.one != 1)
+    sd2 = libsequence.removeColumns(sd,lambda x : x.one != 1)
     print(sd2)
 
 Let's remove all singletons:
 
 .. ipython:: python
 
-    sd3 = removeColumns(sd,lambda x: x.one !=1 and x.zero != 1)
+    sd3 = libsequence.removeColumns(sd,lambda x: x.one !=1 and x.zero != 1)
     print(sd3)
 
 .. note::
@@ -105,20 +103,19 @@ Sliding windows
 
 .. ipython:: python
 
-    from libsequence.windows import Windows
-    w = Windows(sd,window_size=0.1,step_len=0.05,starting_pos=0.,ending_pos=1.0)
+    w = libsequence.Windows(sd,window_size=0.1,step_len=0.05,starting_pos=0.,ending_pos=1.0)
     len(w)
     for i in range(len(w)):
         #Each window is a simData
         wi = w[i]
-        pswi = PolySIM(wi)
+        pswi = libsequence.PolySIM(wi)
         print(pswi.thetaw())
 
 
 Linkage disequilibrium
 ----------------------
 
-The function ``libsequence.summstats.ld`` returns pairwise LD stats as a
+The function ``libsequence.ld`` returns pairwise LD stats as a
 ``list`` of ``dict``\ s. The return value is easily coerced into a
 ``pandas.DataFrame``.
 
@@ -133,9 +130,9 @@ a great overview.
 
 .. ipython:: python
 
-    from libsequence.fst import Fst
+    import libsequence
     sd.size()
-    f = Fst(sd,[5,5])
+    f = libsequence.Fst(sd,[5,5])
 
     #Hudson, Slatkin, and Maddison's FST:
     f.hsm()

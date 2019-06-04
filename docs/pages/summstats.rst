@@ -12,26 +12,24 @@ Simple overview of concepts
 .. ipython:: python
 
     import msprime
-    import libsequence.variant_matrix as vmat
-    import libsequence.summstats as sstats
+    import libsequence
     import numpy as np
 
     # Get a TreeSequence from msprime
     ts = msprime.simulate(100, mutation_rate=250., recombination_rate=250., random_seed=42)
 
     # TreeSequence -> VariantMatrix
-    vm = vmat.VariantMatrix.from_TreeSequence(ts)
+    vm = libsequence.VariantMatrix.from_TreeSequence(ts)
     # VariantMatrix -> AlleleCountMatrix
     ac = vm.count_alleles()
     # Standard summary stats
-    pi = sstats.thetapi(ac)
-    tajd = sstats.tajd(ac)
-    hprime = sstats.hprime(ac, 0) # 0 = reference state = ancestral state
+    pi = libsequence.thetapi(ac)
+    tajd = libsequence.tajd(ac)
+    hprime = libsequence.hprime(ac, 0) # 0 = reference state = ancestral state
 
-Summary statistic functions are found in :mod:`libsequence.summstats`.  Certain 
-summary statistics can be calculated simply from allele counts via
-:class:`libsequence.variant_matrix.AlleleCountMatrix`. Calculations invovling linkage disequilibrium
-will typically require the entire :class:`libsequence.variant_matrix.VariantMatrix` object.
+Certain summary statistics can be calculated simply from allele counts via
+:class:`libsequence.AlleleCountMatrix`. Calculations invovling linkage disequilibrium
+will typically require the entire :class:`libsequence.VariantMatrix` object.
 
 The following examples rely on msprime :cite:`Kelleher2016-cb` to generate input data, but 
 the concepts hold more generally.
@@ -52,8 +50,8 @@ raw scores into z-scores.  In simulation studies, it makes sense to calibrate th
 deviations per bin based on simulations of a null model.  Here, I show how to do this for the :math:`nS_L`
 statistic of :cite:`Ferrer-Admetlla2014-wa`.
 
-The relevant function here is :func:`libsequence.summstats.nsl`, which returns instances of
-:class:`libsequence.summstats.nSLresults`.
+The relevant function here is :func:`libsequence.nsl`, which returns instances of
+:class:`libsequence.nSLresults`.
 
 
 .. plot:: pyplots/nSLbins.py
@@ -66,7 +64,7 @@ Some more complex descriptors of the data are available
 
 .. ipython:: python
 
-    diffs = sstats.difference_matrix(vm)
+    diffs = libsequence.difference_matrix(vm)
 
 Here, `diffs` contains data for representing the distance matrix for the data.  Specifically, these values can be used
 to fill the upper triangle of a matrix:
@@ -96,7 +94,7 @@ In a similar fashion, we can obtain true/false data on whether pairs of haplotyp
 
 .. ipython:: python
 
-    diff_yes_or_no = sstats.is_different_matrix(vm)
+    diff_yes_or_no = libsequence.is_different_matrix(vm)
 
 The contents of this matrix have the exact same layout as `diffs` described above.  The difference is that the data
 elements are encoded as 0 = identical, 1 = different.  This calculation is **much** faster than the previous.
@@ -110,7 +108,7 @@ It is also possible to get a unique label assigned to each haplotype:
 
 .. ipython:: python
 
-    labels = np.array(sstats.label_haplotypes(vm),dtype=np.int32)
+    labels = np.array(libsequence.label_haplotypes(vm),dtype=np.int32)
     print(len(np.unique(labels)))
 
 Internally, the results from `is_different_matrix` are used to assign the labels.
@@ -119,7 +117,7 @@ These labels are likewise used internally to count the number of haplotypes:
 
 .. ipython:: python
 
-    print(sstats.number_of_haplotypes(vm))
+    print(libsequence.number_of_haplotypes(vm))
     # Confirm result via direct comparison to 
     # the data from msprime:
     print(len(np.unique(gm.transpose(),axis=0)))
@@ -128,7 +126,7 @@ What about performance?
 
 .. ipython:: python
 
-    %timeit -n 10 -r 10 sstats.number_of_haplotypes(vm)
+    %timeit -n 10 -r 10 libsequence.number_of_haplotypes(vm)
 
 .. ipython:: python
     

@@ -3,7 +3,7 @@
 Tree Sequences
 ================================
 
-pylibseq is able to generate instances of :class:`libsequence.variant_matrix.VariantMatrix` from a Python object
+pylibseq is able to generate instances of :class:`libsequence.VariantMatrix` from a Python object
 representing a "tree sequence" :cite:`Kelleher2018-fu`. Currently, the primary method of interacting with these data
 structures is via msprime_.
 
@@ -13,19 +13,19 @@ There are two methods to get data into a VariantMatrix.  The first is via numpy 
 .. ipython:: python
 
     import msprime
-    import libsequence.variant_matrix as vmat
+    import libsequence
 
     # Get a TreeSequence from msprime:
     ts = msprime.simulate(100, mutation_rate = 100)
 
     # Use numpy arrays to make VariantMatrix
-    m = vmat.VariantMatrix(ts.genotype_matrix(), ts.tables.sites.position)
+    m = libsequence.VariantMatrix(ts.genotype_matrix(), ts.tables.sites.position)
 
 The second method is to call a class method of VariantMatrix:
 
 .. ipython:: python
 
-    m2 = vmat.VariantMatrix.from_TreeSequence(ts)
+    m2 = libsequence.VariantMatrix.from_TreeSequence(ts)
     assert(m.data == m2.data)
     assert(m.positions == m2.positions)
 

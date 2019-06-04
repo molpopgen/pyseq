@@ -4,7 +4,7 @@ from ._libsequence import *
 
 class Windows:
     """
-    An iterable list of sliding windows created from a :class:`libsequence.polytable.PolyTable`
+    An iterable list of sliding windows created from a :class:`libsequence.PolyTable`
     """
     def __init__(self, pt, window_size, step_len, starting_pos = 0.,  ending_pos = 1):
         self.windows=[]

@@ -1,22 +1,22 @@
 .. _variantmatrix:
 
 The VariantMatrix
-================
+===============================
 
-Variation data are stored in instances of :class:`libsequence.variant_matrix.VariantMatrix`.  This class stores state
+Variation data are stored in instances of :class:`libsequence.VariantMatrix`.  This class stores state
 data as signed 8-bit integers and position data as floats (C/C++ doubles).  Missing data are encoded as negative
 numbers.  You can use any negative number for missing data except the minimum possible value of an 8-bit integer, which
 is reserved for internal use as a "mask" value when filtering data out of variant matrices.
 
 .. ipython:: python
 
-    import libsequence.variant_matrix as vm
+    import libsequence
 
     # You can construct variant matrices from lists
     states = [0, 1, 1, 0, 0, 0, 0, 1]
     pos = [0.1, 0.2]
 
-    m = vm.VariantMatrix(states, pos)
+    m = libsequence.VariantMatrix(states, pos)
     print(m.nsites)
     print(m.nsam)
 
@@ -43,7 +43,7 @@ You can construct from numpy arrays:
 
 .. ipython:: python
 
-    m = vm.VariantMatrix(np.array(states, dtype=np.int8).reshape((2,4)), np.array(pos))
+    m = libsequence.VariantMatrix(np.array(states, dtype=np.int8).reshape((2,4)), np.array(pos))
     print(m.nsites)
     print(m.nsam)
 
@@ -70,14 +70,14 @@ Counting the states at a site
 -------------------------------------
 
 The most straightforward way to get the allele counts at all sites is via
-:class:`libsequence.variant_matrix.AlleleCountMatrix`:
+:class:`libsequence.AlleleCountMatrix`:
 
 .. ipython:: python
 
     import msprime
 
     ts = msprime.simulate(10, mutation_rate=25, random_seed=666)
-    m = vm.VariantMatrix.from_TreeSequence(ts)
+    m = libsequence.VariantMatrix.from_TreeSequence(ts)
     ac = m.count_alleles()
     print(np.array(ac)[:5])
 
@@ -98,12 +98,12 @@ The most straightforward way to get the allele counts at all sites is via
 The allele count data are stored in order of allele label, starting with zero.  The sum
 of allele counts at a site is the sample size at that site.
 
-:class:`libsequence.VariantMatrix.StateCounts` provides a means to generate allele counts
+:class:`libsequence.StateCounts` provides a means to generate allele counts
 on-demand for a site:
 
 .. ipython:: python
 
-    c = vm.StateCounts()
+    c = libsequence.StateCounts()
     # These objects are callable classes:
     c(m.site(0))
     print(c.counts[:3])
@@ -149,7 +149,7 @@ state, an ancestral state, a minor allele state, etc.
     print(c.refstate)
 
     # Let's let 0 be the reference state:
-    c = vm.StateCounts(refstate = 0)
+    c = libsequence.StateCounts(refstate = 0)
     c(m.site(0))
     print(c.counts[:3])
     print(c.refstate)
@@ -159,19 +159,19 @@ You may get all of the counts at all sites in three different ways:
 .. ipython:: python
 
     # Without respect to reference state
-    lc = vm.process_variable_sites(m)
+    lc = libsequence.process_variable_sites(m)
     for i in lc[:5]:
         print(i.counts[:2], i.refstate)
     
     # With a single reference state for all sites
-    lc = vm.process_variable_sites(m, 0)
+    lc = libsequence.process_variable_sites(m, 0)
     for i in lc[:5]:
         print(i.counts[:2], i.refstate)
 
     # With a reference specified state for each site
     rstats = [0 for i in range(m.nsites)]
     rstats[0:len(rstats):2] = [1 for i in range(0,len(rstats),2)] 
-    lc = vm.process_variable_sites(m, rstats)
+    lc = libsequence.process_variable_sites(m, rstats)
     for i in lc[:5]:
         print(i.counts[:2], i.refstate)
 
@@ -183,13 +183,13 @@ Encoding missing data
     :okexcept:
 
     # This is the value of the reserved state:
-    print(vm.VariantMatrix.mask)
+    print(libsequence.VariantMatrix.mask)
 
     # Attempting to construct an object with this
     # value is allowed, but is an error.
     # Downstream analyses will see this and raise exceptions.
 
-    x = vm.VariantMatrix([0, 1, vm.VariantMatrix.mask, 2], [0.2, 0.5])
+    x = libsequence.VariantMatrix([0, 1, libsequence.VariantMatrix.mask, 2], [0.2, 0.5])
     print(x.data)
 
     # For example:
@@ -206,7 +206,7 @@ must take the return value of :func:`libsequence.variant_matrix.VariantMatrix.si
     class RemoveNonRefSingletons(object):
         def __init__(self):
             # Treat 0 as the reference state
-            self.__c = vm.StateCounts(0)
+            self.__c = libsequence.StateCounts(0)
         def __call__(self, x):
             self.__c(x)
             n=np.array(self.__c, copy=False)
@@ -216,9 +216,9 @@ must take the return value of :func:`libsequence.variant_matrix.VariantMatrix.si
             return False
 
     # Copy our data
-    m2 = vm.VariantMatrix(m.data, m.positions)
+    m2 = libsequence.VariantMatrix(m.data, m.positions)
 
-    rv = vm.filter_sites(m2, RemoveNonRefSingletons())
+    rv = libsequence.filter_sites(m2, RemoveNonRefSingletons())
     print(np.array(m))
     print(np.array(m2))
 
@@ -226,7 +226,7 @@ must take the return value of :func:`libsequence.variant_matrix.VariantMatrix.si
     print(rv)
 
 Performance tip: I wrote the callable as a class so that a StateCounts could be stored as member data.  The reason is
-that :attr:`libsequence.variant_matrix.StateCounts.counts` is a buffer whose memory is re-used for each call.  Thus,
+that :attr:`libsequence.StateCounts.counts` is a buffer whose memory is re-used for each call.  Thus,
 storing an instance saves repeated memory allocation/deallocation events for each site.
 
 Similarly, we can remove samples:
@@ -239,9 +239,9 @@ Similarly, we can remove samples:
             return True
         return False
 
-    m2 = vm.VariantMatrix(m.data, m.positions)
+    m2 = libsequence.VariantMatrix(m.data, m.positions)
 
-    rv = vm.filter_haplotypes(m2, remove_all_ref_samples)
+    rv = libsequence.filter_haplotypes(m2, remove_all_ref_samples)
 
     print(rv)
     print(np.array(m))
