@@ -181,6 +181,36 @@ class BuildExt(build_ext):
                     '-stdlib=libc++', '-mmacosx-version-min=10.7']
         build_ext.build_extensions(self)
 
+# Figure out the headers we need to install:
+generated_package_data = {}
+for root, dirnames, filenames in os.walk('libsequence/src/libsequence/Sequence'):
+    print("root=",root)
+    if 'testsuite' not in root and 'Coalescent' not in root:
+        g = glob.glob(root + '/*.hpp')
+        if len(g) > 0:
+            replace = root.replace('/',  '.')
+            # If there's a header file, we add the directory as a package
+            if replace not in PKGS:
+                PKGS.append(replace)
+            try:
+                if '*.hpp' not in generated_package_data[replace]:
+                    generated_package_data[replace].append('*.hpp')
+            except:
+                generated_package_data[replace] = ['*.hpp']
+        g = glob.glob(root + '/*.tcc')
+        if len(g) > 0:
+            replace = root.replace('/', '.')
+            # If there's a template implementation file,
+            # we add the directory as a package
+            if replace not in PKGS:
+                PKGS.append(replace)
+            try:
+                if '*.tcc' not in generated_package_data[replace]:
+                    generated_package_data[replace].append('*.tcc')
+            except:
+                generated_package_data[replace] = ['*.tcc']
+
+print(generated_package_data)
 
 long_desc = open("README.rst").read()
 
@@ -204,6 +234,7 @@ setup(
     install_requires=['pybind11>=@MINPYBIND11@'],
     cmdclass={'build_ext': CMakeBuild},
     packages=PKGS,
+    package_data=generated_package_data,
     # entry_points={
     #     'console_scripts': ['pymsstats = libsequence.msstats_cli:msstats_main']
     # },
