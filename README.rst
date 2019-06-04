@@ -34,7 +34,7 @@ Citation
 
 If you use this software for your research, please cite:
 
-.. literalblock::
+::
 
     @ARTICLE{Thornton2003-wj,
       title    = "Libsequence: a C++ class library for evolutionary genetic
