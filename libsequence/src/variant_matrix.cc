@@ -14,7 +14,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(variant_matrix, m)
+void init_VariantMatrix(py::module & m)
 {
     py::class_<Sequence::AlleleCountMatrix>(
         m, "AlleleCountMatrix", py::buffer_protocol(),

@@ -3,6 +3,7 @@ from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
 import subprocess
+import platform
 import os
 import glob
 
@@ -28,6 +29,71 @@ if '--gcc' in sys.argv:
     sys.argv.remove('--gcc')
 else:
     USE_GCC = False
+
+if '--no-weffcpp' in sys.argv:
+    USE_WEFFCPP = False
+    sys.argv.remove('--no-weffcpp')
+else:
+    USE_WEFFCPP = True
+
+class CMakeExtension(Extension):
+    def __init__(self, name, sourcedir=''):
+        Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
+
+
+class CMakeBuild(build_ext):
+    def run(self):
+        try:
+            out = subprocess.check_output(['cmake', '--version'])
+        except OSError:
+            raise RuntimeError("CMake must be installed to build the following extensions: " +
+                               ", ".join(e.name for e in self.extensions))
+
+        if platform.system() == "Windows":
+            cmake_version = LooseVersion(
+                re.search(r'version\s*([\d.]+)', out.decode()).group(1))
+            if cmake_version < '3.1.0':
+                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
+
+        for ext in self.extensions:
+            self.build_extension(ext)
+
+    def build_extension(self, ext):
+        extdir = os.path.abspath(os.path.dirname(
+            self.get_ext_fullpath(ext.name)))
+        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+                      '-DPYTHON_EXECUTABLE=' + sys.executable]
+
+        # cfg = 'Debug' if DEBUG_MODE is True else 'Release'
+        cfg = 'Release'
+
+        build_args = ['--config', cfg]
+
+        if platform.system() == "Windows":
+            cmake_args += [
+                '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
+            if sys.maxsize > 2**32:
+                cmake_args += ['-A', 'x64']
+            build_args += ['--', '/m']
+        else:
+            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
+            build_args += ['--', '-j2']
+
+        env = os.environ.copy()
+        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
+                                                              self.distribution.get_version())
+
+        if USE_WEFFCPP is False:
+            cmake_args.append('-DUSE_WEFFCPP=OFF')
+        if not os.path.exists(self.build_temp):
+            os.makedirs(self.build_temp)
+        # if SKIP_BUILDING_TESTS is True:
+        #     cmake_args.append('-DBUILD_UNIT_TESTS=OFF')
+        subprocess.check_call(['cmake', ext.sourcedir] +
+                              cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call(['cmake', '--build', '.'] +
+                              build_args, cwd=self.build_temp)
 
 
 class get_pybind_include(object):
@@ -59,47 +125,7 @@ LIBRARY_DIRS = [
 ]
 
 ext_modules = [
-    Extension(
-        'libsequence.polytable',
-        ['libsequence/src/polytable.cc'],
-        library_dirs=LIBRARY_DIRS,
-        include_dirs=INCLUDES,
-        libraries=['sequence'],
-        language='c++'
-    ),
-    Extension(
-        'libsequence.summstats',
-        ['libsequence/src/summstats.cc','libsequence/src/omega_max.cc'],
-        library_dirs=LIBRARY_DIRS,
-        include_dirs=INCLUDES,
-        libraries=['sequence'],
-        language='c++'
-    ),
-    Extension(
-        'libsequence.fst',
-        ['libsequence/src/fst.cc'],
-        library_dirs=LIBRARY_DIRS,
-        include_dirs=INCLUDES,
-        libraries=['sequence'],
-        language='c++'
-    ),
-    Extension(
-        'libsequence.windows_cpp',
-        ['libsequence/src/windows_cpp.cc'],
-        library_dirs=LIBRARY_DIRS,
-        include_dirs=INCLUDES,
-        libraries=['sequence'],
-        language='c++'
-    ),
-    Extension(
-        'libsequence.variant_matrix',
-        ['libsequence/src/variant_matrix.cc'],
-        library_dirs=LIBRARY_DIRS,
-        include_dirs=INCLUDES,
-        libraries=['sequence'],
-        language='c++'
-    ),
-
+    CMakeExtension('libsequence/_libsequence'),
 ]
 
 
@@ -185,10 +211,10 @@ setup(
     long_description=long_desc,
     ext_modules=ext_modules,
     install_requires=['pybind11>=@MINPYBIND11@'],
-    cmdclass={'build_ext': BuildExt},
+    cmdclass={'build_ext': CMakeBuild},
     packages=PKGS,
-    entry_points={
-        'console_scripts': ['pymsstats = libsequence.msstats_cli:msstats_main']
-    },
+    # entry_points={
+    #     'console_scripts': ['pymsstats = libsequence.msstats_cli:msstats_main']
+    # },
     zip_safe=False,
 )
