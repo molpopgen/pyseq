@@ -1,0 +1,3 @@
+[submodule "libsequence/src/libsequence"]
+	path = libsequence/src/libsequence
+	url = https://www.github.com/molpopgen/libsequence
