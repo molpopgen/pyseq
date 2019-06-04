@@ -1,7 +1,6 @@
 from collections import namedtuple
 import msprime
-import libsequence.variant_matrix
-import libsequence.summstats
+import libsequence
 import numpy as np
 import pandas as pd
 
@@ -11,9 +10,7 @@ Datum = namedtuple("Datum", ['dafbin', 'mean', 'sd'])
 
 def get_bin_stats(vm, binsize, minfreq):
     # Get unstandardized nSL for all markers:
-    raw = []
-    for i in range(vm.nsites):
-        raw.append(libsequence.summstats.nsl(vm, i, 0))
+    raw = libsequence.nsl(vm, 0)
     # Filter out any NaN values and values
     # not passing our DAF filter
     raw = [(i.nsl, i.core_count)
@@ -47,7 +44,7 @@ for ts in msprime.simulate(nsam, mutation_rate=25.0,
                            recombination_rate=25.0,
                            num_replicates=nreps,
                            random_seed=seed):
-    vm = libsequence.variant_matrix.VariantMatrix.from_TreeSequence(ts)
+    vm = libsequence.VariantMatrix.from_TreeSequence(ts)
     bins = get_bin_stats(vm, binsize, minfreq)
     results.extend(bins)
 df = pd.DataFrame(results, columns=Datum._fields)
