@@ -1,17 +1,17 @@
 import unittest
 import pickle
-from libsequence.polytable import *
+import libsequence
 
 class test_polytable(unittest.TestCase):
     def testNoPolyTable(self):
         with self.assertRaises(TypeError):
-            x = PolyTable()
+            x = libsequence.PolyTable()
             
 class test_simdata(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         d = [(0.1,"01010101"),(0.2,"01111111")]
-        self.x = SimData(d)
+        self.x = libsequence.SimData(d)
     def testSimpleInit1(self):
         self.assertEqual(self.x.numsites(),2)
     def testSimpleInit2(self):
@@ -20,27 +20,27 @@ class test_simdata(unittest.TestCase):
     def testSimpleInit3(self):
         pos = [0.1,0.2]
         data = ["01","10"]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(pos,data)
         self.assertEqual(x.numsites(),2)
     def testSimpleInit2(self):
         pos = [0.1,0.2]
         data = ["01","10"]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(pos,data)
         self.assertEqual(x.size(),2)
     def testAssignFail1(self):
         with self.assertRaises(RuntimeError):
             ##Sample size at each site unequal
             d = [(0.1,"01010101"),(0.2,"0111")]
-            x = SimData()
+            x = libsequence.SimData()
             x.assign(d)
     def testAssignFail2(self):
         with self.assertRaises(RuntimeError):
             pos = [0.1,0.2]
             #oops--3 sites in second haplotype
             data = ["01","100"]
-            x = SimData()
+            x = libsequence.SimData()
             x.assign(pos,data)
     def testPickle(self):
         d = pickle.dumps(self.x,-1)
@@ -51,23 +51,23 @@ class test_simdata(unittest.TestCase):
 class test_functions_PolySites(unittest.TestCase):
     def testRemoveMono1(self):
         d = [(0.1,"AGAG"),(0.2,"AAAA")]
-        x = PolySites()
+        x = libsequence.PolySites()
         x.assign(d)
-        y=removeMono(x)
+        y=libsequence.removeMono(x)
         self.assertEqual(y.numsites(),1)
         
 class test_functions_SimData(unittest.TestCase):
     def testRemoveMono1(self):
         d = [(0.1,"01010101"),(0.2,"11111111")]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
-        y=removeMono(x)
+        y=libsequence.removeMono(x)
         self.assertEqual(y.numsites(),1)
     def testRemoveMono2(self):
         d = [(0.1,"00000000"),(0.2,"11111111")]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
-        y=removeMono(x)
+        y=libsequence.removeMono(x)
         self.assertEqual(y.numsites(),0)
     def testRemoveColumns1(self):
         d = [(0.1,"01010101"),
@@ -75,31 +75,31 @@ class test_functions_SimData(unittest.TestCase):
              (0.3,"00010000"),
              (0.4,"00000001")
              ]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
         #Remove singletons with a lambda:
-        y = removeColumns(x,lambda x:x.one > 1)
+        y = libsequence.removeColumns(x,lambda x:x.one > 1)
         pos = y.pos()
         self.assertEqual(pos,[0.1,0.2])
     def testIsValid(self):
         d = [(0.1,"01010101"),(0.2,"11011111")]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
-        self.assertEqual(isValid(x),True)
+        self.assertEqual(libsequence.isValid(x),True)
     def testRemoveAmbig(self):
         ##Remove sites other than a,g,c,t,n,0,1
         d = [(0.1,"01010101"),(0.2,"1101Q111")]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
-        y=removeAmbiguous(x)
+        y=libsequence.removeAmbiguous(x)
         pos = y.pos()
         self.assertEqual(pos,[0.1])
     def testRemoveGaps(self):
         ##Remove sites other than a,g,c,t,n,0,1
         d = [(0.1,"01010101"),(0.2,"1101-111")]
-        x = SimData()
+        x = libsequence.SimData()
         x.assign(d)
-        y=removeGaps(x,gapchar='-')
+        y=libsequence.removeGaps(x,gapchar='-')
         pos = y.pos()
         self.assertEqual(pos,[0.1])
                 

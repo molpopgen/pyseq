@@ -31,11 +31,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(polytable, m)
+void init_PolyTable(py::module & m)
 {
-    m.doc() = "Access to libsequence's polymorphism table classes and related "
-              "functions";
-
     py::class_<Sequence::PolyTable>(m, "PolyTable",
                                     "Base class for polymorphism tables")
         .def("data", &Sequence::PolyTable::GetData)

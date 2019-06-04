@@ -26,10 +26,8 @@ PYBIND11_MAKE_OPAQUE(std::vector<Sequence::nSLiHS>);
 
 std::pair<double, double> omega_max(const Sequence::SimData& data);
 
-PYBIND11_MODULE(summstats, m)
+void init_summstats(py::module & m)
 {
-    m.doc() = "Summary statistics";
-
     //These are the "libsequence 2.0"
     //functions
 

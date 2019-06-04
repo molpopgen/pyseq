@@ -5,10 +5,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(windows_cpp, m)
+void init_windows(py::module & m)
 {
-    m.doc() = "Details of sliding window containers.";
-
     using SimDataWindows = Sequence::PolyTableSlice<Sequence::SimData>;
     using PolySitesWindows = Sequence::PolyTableSlice<Sequence::PolySites>;
 

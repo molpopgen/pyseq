@@ -1,5 +1,5 @@
 import unittest
-import libsequence.variant_matrix
+import libsequence
 import numpy as np
 
 
@@ -8,7 +8,7 @@ class testVariantMatrix(unittest.TestCase):
     def setUp(self):
         self.data = [0, 1, 1, 0, 0, 0, 0, 1]
         self.pos = [0.1, 0.2]
-        self.m = libsequence.variant_matrix.VariantMatrix(self.data, self.pos)
+        self.m = libsequence.VariantMatrix(self.data, self.pos)
 
     def testConstruct(self):
         self.assertEqual(self.m.data, self.data)
@@ -32,7 +32,7 @@ class testVariantMatrix(unittest.TestCase):
                         return True
             return False
         self.assertEqual(self.m.nsites, 2)
-        libsequence.variant_matrix.filter_sites(
+        libsequence.filter_sites(
             self.m, is_singleton)
         self.assertEqual(self.m.nsites, 1)
 
@@ -51,7 +51,7 @@ class testColumnViews(unittest.TestCase):
     def setUp(self):
         self.data = [0, 1, 1, 0, 0, 0, 0, 1]
         self.pos = [0.1, 0.2]
-        self.m = libsequence.variant_matrix.VariantMatrix(self.data, self.pos)
+        self.m = libsequence.VariantMatrix(self.data, self.pos)
 
     def testIterateColumns(self):
         for i in range(self.m.nsites):
@@ -75,7 +75,7 @@ class testCreationFromNumpy(unittest.TestCase):
     def testConstruct(self):
         d = np.array([0, 1, 1, 0, 0, 0, 0, 1], dtype=np.int8).reshape((2, 4))
         pos = np.array([0.1, 0.2])
-        m = libsequence.variant_matrix.VariantMatrix(d, pos)
+        m = libsequence.VariantMatrix(d, pos)
         ma = np.array(m)
         self.assertTrue(np.array_equal(np.sum(ma, axis=0), np.sum(d, axis=0)))
         self.assertTrue(np.array_equal(np.sum(ma, axis=1), np.sum(d, axis=1)))
@@ -93,7 +93,7 @@ class testDataFromMsprime(unittest.TestCase):
                 ts = msprime.simulate(10, mutation_rate=10, random_seed=666)
                 gm = ts.genotype_matrix()
                 pos = np.array([i.position for i in ts.sites()])
-                m = libsequence.variant_matrix.VariantMatrix(gm, pos)
+                m = libsequence.VariantMatrix(gm, pos)
                 # If the data conversion is correct, the row and
                 # column sums must match
                 ma = np.array(m, copy=False)

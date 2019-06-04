@@ -6,10 +6,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(fst,m)
+void init_fst(py::module & m)
 {
-    m.doc() ="Fst";
-
     //py::object polytable
     //    = (py::object)py::module::import("libsequence.polytable")
     //          .attr("PolyTable");
