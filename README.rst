@@ -32,19 +32,19 @@ Development branch:
 Requirements:
 ===================================
 
-* libsequence_ must be installed on your system.  **Currently, this package requires libsequence >= 1.9.6**
 * Python 3
 * An up-to-date C++ compiler that is C++11 compatible via the flag -std=c++11.  Roughly, this means GCC >= 4.8 and clang >= 3.5.
 
-.. note:: If you installing from GitHub, then pybind11_ is a dependency.
+.. note:: 
 
-The recommended method for installing libsequence_ is bioconda_.  If you do not use that system, then you should install libsequence_ from source.
+   As of version 0.2.2, libsequence is included as a git submodule compiled
+   directly into the Python package.
+
+   If you installing from GitHub, then pybind11_ is a dependency.
+
 
 If you want to modify the package, you will need pybind11_ installed via your favorite Python package manager.
 
-Currently, only Linux is supported.  The reason is that OS X's case-insensitive file system is preventing current
-versions of libsequence from compiling.  This situation will be resolved once all deprecated features are removed from
-libsequence_
 
 Changelog (rough)
 ==============================
@@ -79,15 +79,14 @@ Or, you may install from GitHub:
 
    $ git clone http://github.com/molpopgen/pylibseq
    $ cd pylibseq
+   $ git submodule init
+   $ git submodule update
 
 .. code-block:: bash
 
    $ ./configure
    $ sudo pip install . 
 
-.. note::
-
-    If you are using GCC on OS X (instead of clang), add --install-option=--gcc when installing.
 
 You may also install from GitHub using pip:
 
@@ -95,17 +94,6 @@ You may also install from GitHub using pip:
 
    $ pip install git+git://github.com/molpopgen/pylibseq 
 
-If you have libsequence in a "funny location" (*e.g.*, something other that /usr/local):
-
-.. code-block:: bash
-
-   $ CPPFLAGS=-I/path/to/libsequence/headers LDFLAGS=-L/path/to/libsequence/library sudo python setup.py install 
-
-For example, if libsequence is installed into /opt:
-
-.. code-block:: bash
-
-   $ CPPFLAGS=-I/opt/include LDFLAGS=-L/opt/lib sudo python setup.py install
 
 Unit testing:
 =======================
@@ -115,9 +103,6 @@ Unit testing:
    $ ./configure
    $ python setup.py build_ext -i 
    $ python -m unittest discover tests
-
-.. note::
-    If using GCC on OS X (instead of clang), add --gcc to the setup.py command
 
 Documentation:
 ======================
