@@ -184,7 +184,6 @@ class BuildExt(build_ext):
 # Figure out the headers we need to install:
 generated_package_data = {}
 for root, dirnames, filenames in os.walk('libsequence/src/libsequence/Sequence'):
-    print("root=",root)
     if 'testsuite' not in root and 'Coalescent' not in root:
         g = glob.glob(root + '/*.hpp')
         if len(g) > 0:
@@ -209,8 +208,6 @@ for root, dirnames, filenames in os.walk('libsequence/src/libsequence/Sequence')
                     generated_package_data[replace].append('*.tcc')
             except:
                 generated_package_data[replace] = ['*.tcc']
-
-print(generated_package_data)
 
 long_desc = open("README.rst").read()
 
